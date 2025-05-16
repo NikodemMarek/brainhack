@@ -1,6 +1,12 @@
 #include "parser.h"
 #include "operation.h"
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <optional>
+#include <string>
 #include <tuple>
+#include <vector>
 
 std::tuple<std::optional<Operation>, std::optional<Operation>>
 combine(Operation a, Operation b) {
@@ -102,4 +108,49 @@ std::optional<Operator> parse_operation(char c) {
   default:
     return std::nullopt;
   }
+}
+
+std::vector<Operation>
+parse_file(const std::string &path,
+           std::function<std::optional<Operator>(char)> parser) {
+  std::ifstream file(path);
+  if (!file.is_open()) {
+    throw std::runtime_error("Could not open file at " + path);
+  }
+
+  std::string str;
+  std::vector<Operation> operations;
+  while (std::getline(file, str)) {
+    std::vector<Operation> parsed = parse(str, parser);
+    if (parsed.empty()) {
+      continue;
+    }
+
+    if (operations.empty()) {
+      operations.insert(operations.end(),
+                        std::make_move_iterator(parsed.begin()),
+                        std::make_move_iterator(parsed.end()));
+      continue;
+    }
+
+    Operation last = std::move(operations.back());
+    operations.pop_back();
+    Operation first = std::move(parsed.front());
+    parsed.erase(parsed.begin());
+
+    std::optional<Operation> combined_first;
+    std::optional<Operation> combined_second;
+    std::tie(combined_first, combined_second) = combine(last, first);
+
+    if (combined_first.has_value()) {
+      operations.push_back(combined_first.value());
+    }
+    if (combined_second.has_value()) {
+      operations.push_back(combined_second.value());
+    }
+    operations.insert(operations.end(), std::make_move_iterator(parsed.begin()),
+                      std::make_move_iterator(parsed.end()));
+  }
+
+  return operations;
 }
