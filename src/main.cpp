@@ -12,14 +12,16 @@ void print_usage(const char *program_name) {
   std::cerr << "Usage: " << program_name << " [options] <file.bf>\n"
             << "Options:\n"
             << "  -o, --output <file>   Specify output file\n"
-            << "  -c, --compile         Compile to assembly\n"
+            << "  -c, --compile         Compile to binary\n"
+            << "  -a, --assembly        Generate assembly\n"
             << "  -h, --help            Show this help message\n";
 }
 
 int main(int argc, char *argv[]) {
   std::optional<std::string> input_filename = std::nullopt;
-  std::string output_filename = "out.asm";
+  std::optional<std::string> output_filename = std::nullopt;
   bool compile = false;
+  bool assembly = false;
 
   for (int i = 1; i < argc; i++) {
     if (argv[i] == std::string("--output") || argv[i] == std::string("-o")) {
@@ -39,12 +41,25 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    if (argv[i] == std::string("--assembly") || argv[i] == std::string("-a")) {
+      assembly = true;
+      continue;
+    }
+
     if (argv[i] == std::string("--help") || argv[i] == std::string("-h")) {
       print_usage(argv[0]);
       return 0;
     }
 
     input_filename = argv[i];
+  }
+
+  if (!output_filename.has_value()) {
+    if (assembly) {
+      output_filename = "out.asm";
+    } else {
+      output_filename = "out";
+    }
   }
 
   if (!input_filename.has_value()) {
@@ -55,7 +70,7 @@ int main(int argc, char *argv[]) {
   auto parsed = parse_file(input_filename.value(), parse_operation);
   Tape tape(parsed);
 
-  if (compile) {
+  if (compile || assembly) {
     Compiler compiler(std::move(tape));
 
     std::string assembled = "";
@@ -76,14 +91,37 @@ int main(int argc, char *argv[]) {
     assembled.append("xor %rdi, %rdi\n");
     assembled.append("syscall\n");
 
-    FILE *file = fopen(output_filename.c_str(), "w");
+    std::string assembly_output_filename = "/tmp/brainhack_out.asm";
+    if (assembly) {
+      assembly_output_filename = output_filename.value();
+    }
+
+    FILE *file = fopen(assembly_output_filename.c_str(), "w");
     if (file == nullptr) {
-      std::cerr << "Error: Could not open file " << output_filename
-                << " for writing." << std::endl;
+      if (assembly) {
+        std::cerr << "Error: Could not open file " << output_filename.value()
+                  << " for writing." << std::endl;
+      } else {
+        std::cerr << "Error: Could not generate assembly file." << std::endl;
+      }
       return 1;
     }
     fprintf(file, "%s", assembled.c_str());
     fclose(file);
+
+    if (assembly) {
+      return 0;
+    }
+
+    if (system("as /tmp/brainhack_out.asm -o /tmp/brainhack_out.o") != 0) {
+      std::cerr << "Error: Could not assemble the output file." << std::endl;
+      return 1;
+    }
+    if (system(("ld /tmp/brainhack_out.o -o " + output_filename.value())
+                   .c_str()) != 0) {
+      std::cerr << "Error: Could not link the output file." << std::endl;
+      return 1;
+    }
   } else {
     Memory memory;
     StdIO io;
