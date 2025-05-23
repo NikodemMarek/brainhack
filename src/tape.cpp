@@ -2,14 +2,20 @@
 
 Tape::Tape(std::vector<Operation> input) : position(0), input(input) {}
 
+std::optional<Operation> Tape::at(int position) {
+  return this->input.at(position);
+}
 std::optional<Operation> Tape::next() {
   if (this->position >= this->input.size()) {
     return std::nullopt;
   }
   return this->input.at(this->position++);
 }
-std::optional<Operation> Tape::at(int position) {
-  return this->input.at(position);
+std::optional<Operation> Tape::peek() {
+  if (this->position >= this->input.size()) {
+    return std::nullopt;
+  }
+  return this->input.at(this->position);
 }
 
 std::optional<int> Tape::get_pair(int start) {

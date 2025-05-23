@@ -8,12 +8,12 @@
 
 class Interpreter {
 public:
-  Interpreter(Tape &&tape, Memory &memory, IO &io);
+  Interpreter(Tape &tape, Memory &memory, IO &io);
 
   bool next();
 
 private:
-  Tape tape;
+  Tape &tape;
   Memory &memory;
   IO &io;
 

@@ -33,6 +33,6 @@ Memory test_memory();
 
 TestIO test_io(std::string input = "");
 
-Interpreter test_interpreter(std::string input, Memory &memory, IO &io);
+Interpreter test_interpreter(Tape &tape, Memory &memory, IO &io);
 
 #endif

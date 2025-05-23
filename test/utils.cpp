@@ -62,6 +62,6 @@ Memory test_memory() {
 
 TestIO test_io(std::string input) { return TestIO(input); }
 
-Interpreter test_interpreter(std::string input, Memory &memory, IO &io) {
-  return Interpreter(std::move(test_tape(input)), memory, io);
+Interpreter test_interpreter(Tape &tape, Memory &memory, IO &io) {
+  return Interpreter(tape, memory, io);
 }

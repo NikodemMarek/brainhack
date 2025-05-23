@@ -12,6 +12,7 @@ public:
 
   std::optional<Operation> at(int position);
   std::optional<Operation> next();
+  std::optional<Operation> peek();
 
   std::optional<int> get_pair(int start);
 

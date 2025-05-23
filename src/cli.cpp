@@ -6,14 +6,14 @@ void print_usage(const std::string program_name) {
             << "  -o, --output <file>   Specify output file\n"
             << "  -c, --compile         Compile to binary\n"
             << "  -a, --assembly        Generate assembly\n"
+            << "  -d, --debug           Debug mode\n"
             << "  -h, --help            Show this help message\n";
 }
 
 std::optional<Options> parse_cli(std::vector<std::string> args) {
   std::optional<std::string> input_filename = std::nullopt;
   std::optional<std::string> output_filename = std::nullopt;
-  bool compile = false;
-  bool assembly = false;
+  Mode mode = Mode::INTERPRET;
 
   for (int i = 1; i < args.size(); i++) {
     if (args[i] == std::string("--output") || args[i] == std::string("-o")) {
@@ -29,12 +29,50 @@ std::optional<Options> parse_cli(std::vector<std::string> args) {
     }
 
     if (args[i] == std::string("--compile") || args[i] == std::string("-c")) {
-      compile = true;
+      if (mode == Mode::ASSEMBLY) {
+        std::cerr << "Error: Cannot use --compile and --assembly together."
+                  << std::endl;
+        return std::nullopt;
+      }
+      if (mode == Mode::DEBUG) {
+        std::cerr << "Error: Cannot use --compile and --debug together."
+                  << std::endl;
+        return std::nullopt;
+      }
+
+      mode = Mode::COMPILE;
       continue;
     }
 
     if (args[i] == std::string("--assembly") || args[i] == std::string("-a")) {
-      assembly = true;
+      if (mode == Mode::COMPILE) {
+        std::cerr << "Error: Cannot use --assembly and --compile together."
+                  << std::endl;
+        return std::nullopt;
+      }
+      if (mode == Mode::DEBUG) {
+        std::cerr << "Error: Cannot use --assembly and --debug together."
+                  << std::endl;
+        return std::nullopt;
+      }
+
+      mode = Mode::ASSEMBLY;
+      continue;
+    }
+
+    if (args[i] == std::string("--debug") || args[i] == std::string("-d")) {
+      if (mode == Mode::COMPILE) {
+        std::cerr << "Error: Cannot use --debug and --compile together."
+                  << std::endl;
+        return std::nullopt;
+      }
+      if (mode == Mode::ASSEMBLY) {
+        std::cerr << "Error: Cannot use --debug and --assembly together."
+                  << std::endl;
+        return std::nullopt;
+      }
+
+      mode = Mode::DEBUG;
       continue;
     }
 
@@ -47,7 +85,7 @@ std::optional<Options> parse_cli(std::vector<std::string> args) {
   }
 
   if (!output_filename.has_value()) {
-    if (assembly) {
+    if (mode == Mode::ASSEMBLY) {
       output_filename = "out.asm";
     } else {
       output_filename = "out";
@@ -59,6 +97,5 @@ std::optional<Options> parse_cli(std::vector<std::string> args) {
     return std::nullopt;
   }
 
-  return Options{input_filename.value(), output_filename.value(), compile,
-                 assembly};
+  return Options{input_filename.value(), output_filename.value(), mode};
 }

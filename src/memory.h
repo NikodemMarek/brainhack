@@ -14,7 +14,7 @@ public:
 
   void move(int by);
 
-private:
+protected:
   int position;
   std::vector<int> memory;
 

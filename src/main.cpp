@@ -1,5 +1,6 @@
 #include "cli.h"
 #include "compiler.h"
+#include "debugger.h"
 #include "interpreter.h"
 #include "parser.h"
 #include "stdio.h"
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
   auto parsed = parse_file(options.input_filename, parse_operation);
   Tape tape(parsed);
 
-  if (options.compile || options.assembly) {
+  if (options.mode == Mode::COMPILE || options.mode == Mode::ASSEMBLY) {
     Compiler compiler(std::move(tape));
 
     std::string assembled = "";
@@ -42,13 +43,13 @@ int main(int argc, char *argv[]) {
     assembled.append("syscall\n");
 
     std::string assembly_output_filename = "/tmp/brainhack_out.asm";
-    if (options.assembly) {
+    if (options.mode == Mode::ASSEMBLY) {
       assembly_output_filename = options.output_filename;
     }
 
     FILE *file = fopen(assembly_output_filename.c_str(), "w");
     if (file == nullptr) {
-      if (options.assembly) {
+      if (options.mode == Mode::ASSEMBLY) {
         std::cerr << "Error: Could not open file " << options.output_filename
                   << " for writing." << std::endl;
       } else {
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
     fprintf(file, "%s", assembled.c_str());
     fclose(file);
 
-    if (options.assembly) {
+    if (options.mode == Mode::ASSEMBLY) {
       return 0;
     }
 
@@ -72,13 +73,19 @@ int main(int argc, char *argv[]) {
       std::cerr << "Error: Could not link the output file." << std::endl;
       return 1;
     }
-  } else {
+  } else if (options.mode == Mode::INTERPRET) {
     Memory memory;
     StdIO io;
-    Interpreter interpreter(std::move(tape), memory, io);
+    Interpreter interpreter(tape, memory, io);
 
     while (interpreter.next()) {
     }
+  } else if (options.mode == Mode::DEBUG) {
+    Debugger debugger(tape);
+    std::cout << "Debugging mode activated." << std::endl;
+    while (debugger.next()) {
+    }
+    std::cout << "Exiting debug mode." << std::endl;
   }
   return 0;
 }

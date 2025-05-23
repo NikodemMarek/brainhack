@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ostream>
 
-Interpreter::Interpreter(Tape &&tape, Memory &memory, IO &io)
+Interpreter::Interpreter(Tape &tape, Memory &memory, IO &io)
     : tape(tape), memory(memory), io(io) {}
 
 bool Interpreter::next() {

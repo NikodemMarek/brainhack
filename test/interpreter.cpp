@@ -2,9 +2,10 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("interpreter should change memory") {
+  auto tape = test_tape("+++++.-----.");
   auto memory = test_memory();
   auto io = test_io();
-  auto operations = test_interpreter("+++++.-----.", memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.is_at_val(0, 5));
@@ -12,9 +13,10 @@ TEST_CASE("interpreter should change memory") {
 }
 
 TEST_CASE("interpreter should move memory pointer") {
+  auto tape = test_tape("+++++>>>>>.<<<<<.");
   auto memory = test_memory();
   auto io = test_io();
-  auto operations = test_interpreter("+++++>>>>>.<<<<<.", memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.is_at_val(0, 0));
@@ -23,9 +25,10 @@ TEST_CASE("interpreter should move memory pointer") {
 
 TEST_CASE("interpreter should input and output values") {
   auto input = "8hP (+\n";
+  auto tape = test_tape(",.,.,.,.,.,.,.");
   auto memory = test_memory();
   auto io = test_io(input);
-  auto operations = test_interpreter(",.,.,.,.,.,.,.", memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.input_buffer == "");
@@ -33,18 +36,20 @@ TEST_CASE("interpreter should input and output values") {
 }
 
 TEST_CASE("interpreter should branch forward when value is 0") {
+  auto tape = test_tape("[.>]++.");
   auto memory = test_memory();
   auto io = test_io();
-  auto operations = test_interpreter("[.>]++.", memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.is_at_val(0, 2));
 }
 
 TEST_CASE("interpreter should not branch forward when value is not 0") {
+  auto tape = test_tape("+.[>.]++.");
   auto memory = test_memory();
   auto io = test_io();
-  auto operations = test_interpreter("+.[>.]++.", memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.is_at_val(0, 1));
@@ -53,9 +58,10 @@ TEST_CASE("interpreter should not branch forward when value is not 0") {
 }
 
 TEST_CASE("interpreter should branch backwards") {
+  auto tape = test_tape("+++++[.-]");
   auto memory = test_memory();
   auto io = test_io();
-  auto operations = test_interpreter("+++++[.-]", memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.is_at_val(0, 5));
@@ -71,9 +77,10 @@ TEST_CASE("interpreter should output 'Hello world!'") {
                             "++..+++.[-]>++++++++[<++++>-]"
                             "<.>+++++++++++[<++++++++>-]<-.--------.+++.------."
                             "--------.[-]>++++++++[<++++>-]<+.[-]++++++++++.";
+  auto tape = test_tape(hello_world);
   auto memory = test_memory();
   auto io = test_io();
-  auto operations = test_interpreter(hello_world, memory, io);
+  auto operations = test_interpreter(tape, memory, io);
   while (operations.next()) {
   }
   REQUIRE(io.output_buffer == "Hello world!\n");
