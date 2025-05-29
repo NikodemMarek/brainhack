@@ -19,6 +19,7 @@ protected:
   std::vector<int> memory;
 
   bool is_in_bounds(int position);
+  void expand(int before, int after);
 };
 
 #endif

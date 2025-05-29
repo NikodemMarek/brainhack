@@ -85,3 +85,15 @@ TEST_CASE("interpreter should output 'Hello world!'") {
   }
   REQUIRE(io.output_buffer == "Hello world!\n");
 }
+
+TEST_CASE("interpreter should expand memory") {
+  auto tape = test_tape("++.<<<<<+.>.");
+  auto memory = test_memory();
+  auto io = test_io();
+  auto operations = test_interpreter(tape, memory, io);
+  while (operations.next()) {
+  }
+  REQUIRE(io.is_at_val(0, 2));
+  REQUIRE(io.is_at_val(1, 1));
+  REQUIRE(io.is_at_val(2, 0));
+}

@@ -1,25 +1,36 @@
 #include "memory.h"
-#include <stdexcept>
 
 Memory::Memory() : memory(30000, 0), position(0) {}
 
+void Memory::expand(int before, int after) {
+  if (before < 0 || after < 0)
+    return;
+
+  if (before > 0) {
+    memory.insert(memory.begin(), before, 0);
+    position += before;
+  }
+  if (after > 0) {
+    memory.insert(memory.end(), after, 0);
+  }
+}
 bool Memory::is_in_bounds(int position) {
   return position >= 0 || position < memory.size();
 }
 
 int Memory::get() {
   if (!is_in_bounds(position))
-    throw std::out_of_range("Memory position out of bounds");
+    return 0;
   return memory[position];
 }
 void Memory::set(int value) {
   if (!is_in_bounds(position))
-    throw std::out_of_range("Memory position out of bounds");
+    return;
   memory[position] = value;
 }
 void Memory::change(int by) {
   if (!is_in_bounds(position))
-    throw std::out_of_range("Memory position out of bounds");
+    return;
   memory[position] += by;
 }
 
@@ -27,8 +38,8 @@ void Memory::move(int by) {
   position += by;
 
   if (position < 0) {
-    position = memory.size() + position;
+    expand(-position, 0);
   } else if (position >= memory.size()) {
-    position = position - memory.size();
+    expand(0, position - memory.size() + 1);
   }
 }
