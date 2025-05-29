@@ -46,11 +46,11 @@ bool Interpreter::next() {
   return true;
 }
 
-void Interpreter::output_memory(int count) {
+void Interpreter::output_memory(const int count) const {
   char out = static_cast<char>(memory.get());
   io.output(out, count);
 }
-void Interpreter::input_memory(int count) {
+void Interpreter::input_memory(const int count) {
   char input = io.input(count);
   memory.set(static_cast<int>(input));
 }

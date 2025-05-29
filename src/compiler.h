@@ -4,13 +4,31 @@
 #include "tape.h"
 #include <string>
 
-class Compiler {
+class GnuAssembly {
 public:
-  Compiler(Tape &&tape);
+  std::string prologue() const;
+  std::string epilogue() const;
+  std::string operation(const Tape &tape, const Operation &operation) const;
+};
 
-  std::optional<std::string> next();
+template <typename Assembly> class Compiler {
+public:
+  Compiler(Tape &&tape, Assembly &&assembly)
+      : assembly(std::forward<Assembly>(assembly)), tape(std::move(tape)) {}
+
+  std::string complie() {
+    std::string assembled = "";
+    std::optional<Operation> op = tape.next();
+    while (op.has_value()) {
+      assembled.append(assembly.operation(tape, op.value()));
+      op = tape.next();
+    }
+
+    return assembly.prologue() + assembled + assembly.epilogue();
+  }
 
 private:
+  Assembly assembly;
   Tape tape;
 };
 

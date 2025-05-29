@@ -12,7 +12,7 @@ combine(Operation a, Operation b);
 
 std::vector<Operation>
 parse(std::string input, std::function<std::optional<Operator>(char)> parser);
-std::optional<Operator> parse_operation(char c);
+std::optional<Operator> parse_operation(const char c);
 
 std::vector<Operation>
 parse_file(const std::string &path,

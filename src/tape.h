@@ -10,15 +10,15 @@ class Tape {
 public:
   Tape(std::vector<Operation> input);
 
-  std::optional<Operation> at(int position);
+  std::optional<Operation> at(const int position) const;
   std::optional<Operation> next();
-  std::optional<Operation> peek();
+  std::optional<Operation> peek() const;
 
-  std::optional<int> get_pair(int start);
+  std::optional<int> get_pair(const int start) const;
 
-  void branch(int to);
+  void branch(const int to);
 
-  int get_position();
+  int get_position() const;
 
 private:
   int position;

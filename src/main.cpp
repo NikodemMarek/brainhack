@@ -22,25 +22,8 @@ int main(int argc, char *argv[]) {
   Tape tape(parsed);
 
   if (options.mode == Mode::COMPILE || options.mode == Mode::ASSEMBLY) {
-    Compiler compiler(std::move(tape));
-
-    std::string assembled = "";
-    assembled.append(".bss\n");
-    assembled.append(".lcomm bf_tape, 30000\n");
-    assembled.append(".text\n");
-    assembled.append(".globl _start\n");
-    assembled.append("_start:\n");
-    assembled.append("mov $bf_tape, %rbx\n");
-
-    std::optional<std::string> line = compiler.next();
-    while (line.has_value()) {
-      assembled.append(line.value());
-      line = compiler.next();
-    }
-
-    assembled.append("mov $60, %rax\n");
-    assembled.append("xor %rdi, %rdi\n");
-    assembled.append("syscall\n");
+    Compiler compiler(std::move(tape), GnuAssembly());
+    std::string assembled = compiler.complie();
 
     std::string assembly_output_filename = "/tmp/brainhack_out.asm";
     if (options.mode == Mode::ASSEMBLY) {
@@ -61,6 +44,8 @@ int main(int argc, char *argv[]) {
     fclose(file);
 
     if (options.mode == Mode::ASSEMBLY) {
+      std::cout << "Assembly file generated: `" << options.output_filename
+                << "`" << std::endl;
       return 0;
     }
 
@@ -73,6 +58,8 @@ int main(int argc, char *argv[]) {
       std::cerr << "Error: Could not link the output file." << std::endl;
       return 1;
     }
+    std::cout << "Compiled successfully to `" << options.output_filename << "`"
+              << std::endl;
   } else if (options.mode == Mode::INTERPRET) {
     Memory memory;
     StdIO io;

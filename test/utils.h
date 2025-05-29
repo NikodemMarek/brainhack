@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "../src/compiler.h"
 #include "../src/interpreter.h"
 #include "../src/memory.h"
 #include "../src/operation.h"
@@ -34,5 +35,14 @@ Memory test_memory();
 TestIO test_io(std::string input = "");
 
 Interpreter test_interpreter(Tape &tape, Memory &memory, IO &io);
+
+class TestAssembly {
+public:
+  std::string prologue() const;
+  std::string epilogue() const;
+  std::string operation(const Tape &tape, const Operation &operation) const;
+};
+
+Compiler<TestAssembly> test_compiler(Tape &tape);
 
 #endif

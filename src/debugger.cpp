@@ -7,7 +7,8 @@
 
 DebuggerMemory::DebuggerMemory() : Memory() {}
 
-std::vector<int> DebuggerMemory::get_range(int start, int end) {
+std::vector<int> DebuggerMemory::get_range(const int start,
+                                           const int end) const {
   std::vector<int> range;
   for (int i = start; i < end; ++i) {
     range.push_back(memory[i]);
@@ -15,7 +16,7 @@ std::vector<int> DebuggerMemory::get_range(int start, int end) {
   return range;
 }
 
-std::string ascii_to_human_readable(int value) {
+std::string ascii_to_human_readable(const int value) {
   switch (value) {
   case 0:
     return "NUL";
@@ -85,7 +86,7 @@ std::string ascii_to_human_readable(int value) {
   return std::string(1, static_cast<char>(value));
 }
 
-std::string DebuggerMemory::print_range() {
+std::string DebuggerMemory::print_range() const {
   int start = position - 5 < 0 ? 0 : position - 5;
   int end = position + 5 > memory.size() ? memory.size() : position + 5;
   auto start_str = std::to_string(start);
@@ -117,16 +118,16 @@ std::string DebuggerMemory::print_range() {
          frame_line + "\n" + pointer_line;
 }
 
-int DebuggerMemory::pointer() { return position; }
+int DebuggerMemory::pointer() const { return position; }
 
 DebugIO::DebugIO() : output_buffer() {}
 
-void DebugIO::output(char c, int count) {
+void DebugIO::output(const char c, const int count) {
   for (int i = 0; i < count; i++) {
     output_buffer += c;
   }
 }
-char DebugIO::input(int count) {
+char DebugIO::input(const int count) {
   char c;
   for (int i = 0; i < count; i++) {
     c = getchar();
@@ -134,7 +135,7 @@ char DebugIO::input(int count) {
   return c;
 }
 
-std::string DebugIO::get_output() { return output_buffer; }
+std::string DebugIO::get_output() const { return output_buffer; }
 
 Debugger::Debugger(Tape &tape)
     : tape(tape), memory(), io(), interpreter(tape, memory, io) {}
@@ -193,7 +194,7 @@ std::string print_operation(const Operation &operation,
   return "NONE";
 }
 
-std::string Debugger::print_state() {
+std::string Debugger::print_state() const {
   return "Output: " + io.get_output() + "\n\n" + memory.print_range() +
          "\nNext operation: " +
          print_operation(*tape.peek(), memory.get(), +memory.pointer()) +

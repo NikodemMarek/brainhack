@@ -2,7 +2,7 @@
 
 Memory::Memory() : memory(30000, 0), position(0) {}
 
-void Memory::expand(int before, int after) {
+void Memory::expand(const int before, const int after) {
   if (before < 0 || after < 0)
     return;
 
@@ -14,27 +14,27 @@ void Memory::expand(int before, int after) {
     memory.insert(memory.end(), after, 0);
   }
 }
-bool Memory::is_in_bounds(int position) {
+bool Memory::is_in_bounds(const int position) const {
   return position >= 0 || position < memory.size();
 }
 
-int Memory::get() {
+int Memory::get() const {
   if (!is_in_bounds(position))
     return 0;
   return memory[position];
 }
-void Memory::set(int value) {
+void Memory::set(const int value) {
   if (!is_in_bounds(position))
     return;
   memory[position] = value;
 }
-void Memory::change(int by) {
+void Memory::change(const int by) {
   if (!is_in_bounds(position))
     return;
   memory[position] += by;
 }
 
-void Memory::move(int by) {
+void Memory::move(const int by) {
   position += by;
 
   if (position < 0) {

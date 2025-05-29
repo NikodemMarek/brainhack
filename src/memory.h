@@ -8,18 +8,18 @@ class Memory {
 public:
   Memory();
 
-  int get();
-  void set(int value);
-  void change(int by);
+  int get() const;
+  void set(const int value);
+  void change(const int by);
 
-  void move(int by);
+  void move(const int by);
 
 protected:
   int position;
   std::vector<int> memory;
 
-  bool is_in_bounds(int position);
-  void expand(int before, int after);
+  bool is_in_bounds(const int position) const;
+  void expand(const int before, const int after);
 };
 
 #endif

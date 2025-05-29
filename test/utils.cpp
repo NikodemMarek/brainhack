@@ -65,3 +65,37 @@ TestIO test_io(std::string input) { return TestIO(input); }
 Interpreter test_interpreter(Tape &tape, Memory &memory, IO &io) {
   return Interpreter(tape, memory, io);
 }
+
+std::string TestAssembly::prologue() const {
+  return "bf_tape declaration\nstart function definition\n";
+}
+std::string TestAssembly::epilogue() const {
+  return "call to end the program\n";
+}
+std::string TestAssembly::operation(const Tape &tape,
+                                    const Operation &operation) const {
+  int count = operation.count;
+  switch (operation.op) {
+  case Operator::INCREMENT:
+    return "increment " + std::to_string(count) + "\n";
+  case Operator::DECREMENT:
+    return "decrement " + std::to_string(count) + "\n";
+  case Operator::RIGHT:
+    return "right " + std::to_string(count) + "\n";
+  case Operator::LEFT:
+    return "left " + std::to_string(count) + "\n";
+  case Operator::OUTPUT:
+    return "output " + std::to_string(count) + "\n";
+  case Operator::INPUT:
+    return "input " + std::to_string(count) + "\n";
+  case Operator::FORWARD:
+    return "forward\n";
+  case Operator::BACKWARD:
+    return "backward\n";
+  }
+  return "";
+}
+
+Compiler<TestAssembly> test_compiler(Tape &tape) {
+  return Compiler<TestAssembly>(std::move(tape), TestAssembly());
+}

@@ -17,8 +17,8 @@ private:
   Memory &memory;
   IO &io;
 
-  void output_memory(int count);
-  void input_memory(int count);
+  void output_memory(const int count) const;
+  void input_memory(const int count);
 
   void branch_forward();
   void branch_backwards();

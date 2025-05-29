@@ -86,7 +86,7 @@ parse(std::string input, std::function<std::optional<Operator>(char)> parser) {
   return operations;
 }
 
-std::optional<Operator> parse_operation(char c) {
+std::optional<Operator> parse_operation(const char c) {
   switch (c) {
   case '+':
     return Operator::INCREMENT;
