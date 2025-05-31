@@ -1,7 +1,7 @@
 #include "cli.h"
 
 void print_usage(const std::string program_name) {
-  std::cerr << "Usage: " << program_name << " [options] <file.bf>\n"
+  std::cout << "Usage: " << program_name << " [options] <file.bf>\n"
             << "Options:\n"
             << "  -o, --output <file>   Specify output file\n"
             << "  -c, --compile         Compile to binary\n"
